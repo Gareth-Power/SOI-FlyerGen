@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SaIL FlyerGen — Foundations in Patient Safety</title>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-svg@1.1.0/lib/qrcode.js"></script>
+<link href="quill.snow.local.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
+<style>
+  /* ── Reset ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --magenta: #005EB8;
+    --pink-2:  #ec5fa9;
+    --ink:     #1a0f1f;
+    --soft:    #4a3f50;
+  }
+
+  /* ── Generator shell ── */
+  body {
+    font-family: 'Manrope', system-ui, sans-serif;
+    background: #eef4f9;
+    color: var(--ink);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .generator-header {
+    background: var(--magenta);
+    color: #fff;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+
+  .generator-header h1 {
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  .generator-body {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: 0;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ── Sidebar form ── */
+  .sidebar {
+    background: #fff;
+    border-right: 1px solid #d5e4f1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  .sidebar-fields {
+    padding: 28px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex: 1;
+  }
+
+  .sidebar h2 {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--magenta);
+    border-bottom: 1px solid #deebf7;
+    padding-bottom: 8px;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .field label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--soft);
+  }
+
+  .field-label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .field-label-row label {
+    margin: 0;
+  }
+
+  .text-size-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .text-size-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: #6b84a0;
+    text-transform: uppercase;
+  }
+
+  .text-size-btn {
+    width: 24px;
+    height: 24px;
+    border: 1px solid #c5d9ea;
+    border-radius: 999px;
+    background: #fff;
+    color: var(--magenta);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .text-size-btn:hover {
+    border-color: var(--magenta);
+    background: #f1f7fc;
+  }
+
+  .text-size-btn:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+
+  .field input,
+  .field textarea {
+    border: 1.5px solid #c5d9ea;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--ink);
+    background: #fbfdff;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    outline: none;
+    width: 100%;
+  }
+
+  .field input:focus,
+  .field textarea:focus {
+    border-color: var(--magenta);
+    box-shadow: 0 0 0 3px rgba(0,94,184,0.12);
+  }
+
+  /* Quill overrides */
+  #inp-desc-editor .ql-toolbar {
+    border: 1.5px solid #c5d9ea;
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    background: #f1f7fc;
+    padding: 6px 8px;
+  }
+
+  #inp-desc-editor {
+    --desc-editor-font-size: 13px;
+  }
+
+  #inp-desc-editor .ql-container {
+    border: 1.5px solid #c5d9ea;
+    border-radius: 0 0 8px 8px;
+    font-family: 'Manrope', system-ui, sans-serif;
+    font-size: var(--desc-editor-font-size);
+    color: var(--ink);
+    min-height: 240px;
+    max-height: 480px;
+    overflow-y: auto;
+  }
+
+  #inp-desc-editor .ql-editor {
+    min-height: 240px;
+    line-height: 1.6;
+    padding: 10px 12px;
+  }
+
+  #inp-desc-editor .ql-editor.ql-blank::before {
+    color: #b0a0b0;
+    font-style: normal;
+  }
+
+  .bg-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+
+  .color-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 6px;
+  }
+
+  .color-swatch {
+    aspect-ratio: 1;
+    border-radius: 6px;
+  }
+
+  .bg-thumb {
+    aspect-ratio: 3/2;
+    border-radius: 6px;
+    border: 2px solid transparent;
+    background-size: cover;
+    background-position: center;
+    background-clip: padding-box;
+    background-color: #e6eff7;
+    cursor: pointer;
+    padding: 0;
+    transition: border-color 0.15s, opacity 0.15s;
+    overflow: hidden;
+  }
+
+  .bg-thumb:hover { opacity: 0.85; }
+
+  .bg-thumb.selected {
+    border-color: var(--magenta);
+    box-shadow: 0 0 0 2px rgba(0,94,184,0.25);
+  }
+
+  .bg-upload-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #e6eff7;
+    color: var(--magenta);
+  }
+
+  .bg-upload-btn svg { pointer-events: none; }
+
+  #inp-desc-editor .ql-toolbar button:hover,
+  #inp-desc-editor .ql-toolbar button.ql-active {
+    color: var(--magenta);
+  }
+
+  #inp-desc-editor .ql-toolbar button:hover .ql-stroke,
+  #inp-desc-editor .ql-toolbar button.ql-active .ql-stroke {
+    stroke: var(--magenta);
+  }
+
+  #inp-desc-editor .ql-toolbar button:hover .ql-fill,
+  #inp-desc-editor .ql-toolbar button.ql-active .ql-fill {
+    fill: var(--magenta);
+  }
+
+  .field .hint {
+    font-size: 11px;
+    color: #7b8ea3;
+    line-height: 1.4;
+  }
+
+  .btn-row {
+    margin-top: auto;
+    padding-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .btn {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    text-align: center;
+    transition: opacity 0.15s;
+  }
+
+  .btn:hover { opacity: 0.88; }
+
+  .btn-primary {
+    background: var(--magenta);
+    color: #fff;
+  }
+
+  .btn-secondary {
+    background: #e4eef7;
+    color: var(--magenta);
+  }
+
+  /* ── Preview area ── */
+  .preview-area {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    background: #3b3b3b;
+    overflow-y: auto;
+    height: 100%;
+  }
+
+  .flyer {
+    width: 210mm;
+    height: 148mm;
+    background: #fff;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 32px 80px -18px rgba(0, 0, 0, 0.45), 0 18px 42px -20px rgba(214, 22, 140, 0.3);
+    flex-shrink: 0;
+  }
+
+  .image {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #edf6ff 0%, #d8eafe 48%, #c4ddf7 100%);
+    overflow: hidden;
+    z-index: 0;
+  }
+
+  .image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    filter: blur(6px) saturate(1.15);
+    transform: scale(1.08);
+  }
+
+  .image::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(0,0,0,0.04) 0%, rgba(0,0,0,0.12) 100%);
+    pointer-events: none;
+  }
+
+  .diamond {
+    position: absolute;
+    top: 50%;
+    left: 50mm;
+    width: 122mm;
+    height: 122mm;
+    transform: translate(-50%, -50%);
+    background: #005EB8;
+    border-radius: 50%;
+    filter: drop-shadow(0 20px 30px rgba(0, 94, 184, 0.45)) drop-shadow(0 8px 12px rgba(0, 0, 0, 0.2));
+    z-index: 2;
+  }
+
+  .logo {
+    position: absolute;
+    top: 10.5mm;
+    right: 10mm;
+    width: 68mm;
+    z-index: 4;
+  }
+
+  .logo img {
+    width: 100%;
+    height: auto;
+    display: block;
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.15));
+  }
+
+  .title-wrap {
+    position: absolute;
+    top: 54%;
+    left: 50mm;
+    transform: translate(-50%, -50%);
+    width: 72mm;
+    text-align: center;
+    color: #fff;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .title-box {
+    min-height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: visible;
+  }
+
+  h1 {
+    font-weight: 800;
+    font-size: 30px;
+    line-height: 1.06;
+    letter-spacing: -0.025em;
+    color: #fff;
+  }
+
+  .meta {
+    margin-top: 7mm;
+    padding-top: 5mm;
+    border-top: 1px solid rgba(255,255,255,0.45);
+    display: flex;
+    justify-content: space-around;
+    gap: 4mm;
+  }
+
+  .meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5mm;
+  }
+
+  .meta-label {
+    font-size: 7px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.75);
+  }
+
+  .meta-value {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-style: italic;
+    font-size: 13px;
+    color: #fff;
+    line-height: 1.1;
+  }
+
+  .qr {
+    margin: 5mm auto 0;
+    width: 22mm;
+    height: 22mm;
+    background: #fff;
+    padding: 1.5mm;
+    border-radius: 1mm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .qr canvas, .qr img {
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+  }
+
+  .qr-label {
+    margin-top: 2mm;
+    font-size: 6.5px;
+    font-weight: 700;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.85);
+  }
+
+  .contact-email {
+    position: absolute;
+    left: 4.5mm;
+    bottom: 3mm;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: rgba(255,255,255,0.96);
+    z-index: 3;
+  }
+
+  .panel {
+    position: absolute;
+    top: 48mm;
+    right: 0;
+    bottom: 0;
+    width: 90mm;
+    background: rgba(255, 255, 255, 0.88);
+    font-size: 10px;
+    padding: 10mm 11mm;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: none;
+    filter: drop-shadow(-12px 10px 18px rgba(0, 0, 0, 0.18)) drop-shadow(-3px 0 10px rgba(214, 22, 140, 0.12));
+    isolation: isolate;
+    z-index: 1;
+  }
+
+  .panel > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .panel::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 14px;
+    background: rgba(255, 255, 255, 0.96);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .panel p {
+    font-size: inherit;
+    line-height: 1.6;
+    color: var(--soft);
+    margin-bottom: 3mm;
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .panel p:last-of-type { margin-bottom: 0; }
+
+  .panel ol, .panel ul {
+    font-size: inherit;
+    line-height: 1.6;
+    color: var(--soft);
+    margin-bottom: 3mm;
+    padding-left: 4mm;
+  }
+
+  .panel li { margin-bottom: 1mm; }
+
+  .panel strong { font-weight: 700; color: var(--ink); }
+  .panel em { font-style: italic; }
+
+  @media (max-width: 1100px) {
+    .generator-body { grid-template-columns: 1fr; }
+    .preview-area { padding: 24px 16px; }
+    .flyer { transform: scale(0.55); transform-origin: top center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="generator-body">
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar">
+    <header class="generator-header">
+      <div><h1>SOI FlyerGen</h1></div>
+    </header>
+    <div class="sidebar-fields">
+    <h2>Event Details</h2>
+
+    <div class="field">
+      <label for="inp-title">Course Title</label>
+      <input type="text" id="inp-title" placeholder="e.g. Interview Practice Session" autocomplete="off">
+    </div>
+
+    <div class="field">
+      <label for="inp-date">Date</label>
+      <input type="text" id="inp-date" placeholder="e.g. 14 July 2026" autocomplete="off">
+    </div>
+
+    <div class="field">
+      <label for="inp-location">Location</label>
+      <input type="text" id="inp-location" placeholder="e.g. Sherman Education Centre, Guy's Hospital" autocomplete="off">
+    </div>
+
+    <div class="field">
+      <label for="inp-url">Booking URL</label>
+      <input type="text" id="inp-url" placeholder="https://…" autocomplete="off">
+      <span class="hint">Used to generate the QR code on the flyer.</span>
+    </div>
+
+    <div class="field">
+      <div class="field-label-row">
+        <label>Description</label>
+        <div class="text-size-controls" aria-label="Description text size controls">
+          <span class="text-size-label">Text Size</span>
+          <button class="text-size-btn" id="desc-size-decrease-btn" type="button" aria-label="Decrease description text size">-</button>
+          <button class="text-size-btn" id="desc-size-increase-btn" type="button" aria-label="Increase description text size">+</button>
+        </div>
+      </div>
+      <div id="inp-desc-editor"></div>
+      <span class="hint">Formatted text will appear in the white panel on the flyer.</span>
+    </div>
+
+    <h2 style="margin-top:4px">Appearance</h2>
+
+    <div class="field">
+      <label>Solid Colour</label>
+      <div class="color-grid" id="color-grid">
+        <button class="bg-thumb color-swatch" data-color="#eaf4ff" style="background:#eaf4ff" title="Ice"></button>
+        <button class="bg-thumb color-swatch" data-color="#f4d7e7" style="background:#f4d7e7" title="Blush"></button>
+        <button class="bg-thumb color-swatch" data-color="#d9f0ee" style="background:#d9f0ee" title="Seafoam"></button>
+        <button class="bg-thumb color-swatch" data-color="#f4e6cf" style="background:#f4e6cf" title="Sand"></button>
+        <button class="bg-thumb color-swatch" data-color="#c8dbef" style="background:#c8dbef" title="Slate"></button>
+        <button class="bg-thumb color-swatch" data-color="#f5efc9" style="background:#f5efc9" title="Butter"></button>
+        <button class="bg-thumb color-swatch" data-color="#dbe8d7" style="background:#dbe8d7" title="Sage"></button>
+        <button class="bg-thumb color-swatch" data-color="#eef1f6" style="background:#eef1f6" title="Cloud"></button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Background Image</label>
+      <div class="bg-grid" id="bg-grid">
+        <button class="bg-thumb" data-src="Backgrounds/1.png" style="background-image:url('Backgrounds/1.png')"></button>
+        <button class="bg-thumb" data-src="Backgrounds/2.png" style="background-image:url('Backgrounds/2.png')"></button>
+        <button class="bg-thumb" data-src="Backgrounds/3.png" style="background-image:url('Backgrounds/3.png')"></button>
+        <button class="bg-thumb" data-src="Backgrounds/4.png" style="background-image:url('Backgrounds/4.png')"></button>
+        <button class="bg-thumb" data-src="Backgrounds/5.png" style="background-image:url('Backgrounds/5.png')"></button>
+        <button class="bg-thumb" data-src="Backgrounds/6.png" style="background-image:url('Backgrounds/6.png')"></button>
+        <button class="bg-thumb" data-src="Backgrounds/7.png" style="background-image:url('Backgrounds/7.png')"></button>
+        <label class="bg-thumb bg-upload-btn" for="inp-bg" title="Upload your own">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><path d="M12 16V8m0 0-3 3m3-3 3 3"/><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+        </label>
+        <input type="file" id="inp-bg" accept="image/*" style="display:none">
+      </div>
+      <span class="hint">Select a preset or upload your own image.</span>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" id="download-image-btn" type="button">Download High-Res Image</button>
+      <button class="btn btn-secondary" id="reset-form-btn" type="button">Reset</button>
+    </div>
+    </div>
+  </aside>
+
+  <!-- ── Preview ── -->
+  <main class="preview-area">
+    <article class="flyer" id="flyer">
+
+      <div class="image">
+        <img src="" alt="" id="bg-img">
+      </div>
+
+      <div class="logo">
+        <img src="GSTT.png" alt="Simulation &amp; Interactive Learning — Guy's &amp; St Thomas', London">
+      </div>
+
+      <div class="diamond"></div>
+
+      <div class="title-wrap">
+      <div class="title-box">
+          <h1 id="out-title"></h1>
+        </div>
+
+        <div class="meta">
+          <div class="meta-item">
+            <span class="meta-label">Date</span>
+            <span class="meta-value" id="out-date">TBC</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Location</span>
+            <span class="meta-value" id="out-location">TBC</span>
+          </div>
+        </div>
+
+        <div class="qr" id="out-qr"></div>
+        <div class="qr-label">Scan to book</div>
+      </div>
+
+      <div class="panel" id="out-panel"></div>
+
+      <div class="contact-email">gstt.schoolofimprovement@nhs.net</div>
+
+    </article>
+  </main>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
+
