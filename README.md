@@ -1,5 +1,5 @@
 <p align="center">
-	<img src="Thumb.png" alt="FlyerGen thumbnail" width="240">
+	<img src="Thumb.png" alt="FlyerGen thumbnail" width="640">
 </p>
 
 # School of Improvement (SOI) FlyerGen
