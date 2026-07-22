@@ -2,6 +2,7 @@ const inpTitle = document.getElementById('inp-title');
 const inpDate = document.getElementById('inp-date');
 const inpLocation = document.getElementById('inp-location');
 const inpUrl = document.getElementById('inp-url');
+const inpEmail = document.getElementById('inp-email');
 
 const quill = new Quill('#inp-desc-editor', {
   theme: 'snow',
@@ -18,6 +19,7 @@ const quill = new Quill('#inp-desc-editor', {
 const outTitle = document.getElementById('out-title');
 const outDate = document.getElementById('out-date');
 const outLocation = document.getElementById('out-location');
+const outEmail = document.getElementById('out-email');
 const outQr = document.getElementById('out-qr');
 const outPanel = document.getElementById('out-panel');
 const downloadImageBtn = document.getElementById('download-image-btn');
@@ -30,6 +32,7 @@ const colorGrid = document.getElementById('color-grid');
 const bgImage = document.querySelector('#bg-img');
 const imageDiv = document.querySelector('.image');
 const transparentPixel = 'data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=';
+const defaultEmail = 'gstt.schoolofimprovement@nhs.net';
 let backgroundLoadToken = 0;
 let descriptionSizeStep = 0;
 
@@ -62,6 +65,11 @@ function updateDate() {
 function updateLocation() {
   const val = inpLocation.value.trim();
   outLocation.textContent = val || 'TBC';
+}
+
+function updateEmail() {
+  const val = inpEmail.value.trim();
+  outEmail.textContent = val || defaultEmail;
 }
 
 function updateDescription() {
@@ -282,6 +290,7 @@ function resetForm() {
   inpDate.value = '';
   inpLocation.value = '';
   inpUrl.value = '';
+  inpEmail.value = '';
   quill.setContents([]);
 
   hideBackgroundImage();
@@ -294,6 +303,7 @@ function resetForm() {
   updateTitle();
   updateDate();
   updateLocation();
+  updateEmail();
   updateQr();
   updateDescription();
 }
@@ -328,6 +338,7 @@ inpBg.addEventListener('change', async function() {
 inpTitle.addEventListener('input', updateTitle);
 inpDate.addEventListener('input', updateDate);
 inpLocation.addEventListener('input', updateLocation);
+inpEmail.addEventListener('input', updateEmail);
 quill.on('text-change', updateDescription);
 
 document.addEventListener('focusin', function(e) {
@@ -348,4 +359,5 @@ applyDescriptionTextSize();
 updateTitle();
 updateQr();
 updateDescription();
+updateEmail();
 hideBackgroundImage();
