@@ -1,4 +1,5 @@
 const inpTitle = document.getElementById('inp-title');
+const inpSubtitle = document.getElementById('inp-subtitle');
 const inpDate = document.getElementById('inp-date');
 const inpLocation = document.getElementById('inp-location');
 const inpUrl = document.getElementById('inp-url');
@@ -17,6 +18,7 @@ const quill = new Quill('#inp-desc-editor', {
 });
 
 const outTitle = document.getElementById('out-title');
+const outSubtitle = document.getElementById('out-subtitle');
 const outDate = document.getElementById('out-date');
 const outLocation = document.getElementById('out-location');
 const outEmail = document.getElementById('out-email');
@@ -29,10 +31,13 @@ const descSizeIncreaseBtn = document.getElementById('desc-size-increase-btn');
 const inpBg = document.getElementById('inp-bg');
 const bgGrid = document.getElementById('bg-grid');
 const colorGrid = document.getElementById('color-grid');
+const circleColorGrid = document.getElementById('circle-color-grid');
 const bgImage = document.querySelector('#bg-img');
 const imageDiv = document.querySelector('.image');
+const diamond = document.querySelector('.diamond');
 const transparentPixel = 'data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=';
 const defaultEmail = 'gstt.schoolofimprovement@nhs.net';
+const defaultCircleColor = '#005EB8';
 let backgroundLoadToken = 0;
 let descriptionSizeStep = 0;
 
@@ -54,6 +59,22 @@ function updateTitle() {
   while (size > 10 && outTitle.offsetHeight > 68) {
     size -= 1;
     outTitle.style.fontSize = size + 'px';
+  }
+}
+
+function updateSubtitle() {
+  const val = inpSubtitle.value.trim();
+  outSubtitle.textContent = val;
+
+  if (!val) {
+    return;
+  }
+
+  outSubtitle.style.fontSize = '15px';
+  let size = 15;
+  while (size > 9 && outSubtitle.offsetHeight > 20) {
+    size -= 1;
+    outSubtitle.style.fontSize = size + 'px';
   }
 }
 
@@ -196,6 +217,21 @@ function selectColor(color, thumbEl) {
   if (thumbEl) thumbEl.classList.add('selected');
 }
 
+function clearCircleColorSelections() {
+  circleColorGrid.querySelectorAll('.circle-color-swatch').forEach(function(btn) {
+    btn.classList.remove('selected');
+  });
+}
+
+function selectCircleColor(color, thumbEl) {
+  if (diamond) {
+    diamond.style.background = color;
+  }
+
+  clearCircleColorSelections();
+  if (thumbEl) thumbEl.classList.add('selected');
+}
+
 function makeImageFileName() {
   const title = (inpTitle.value.trim() || 'Blank').replace(/[<>:"/\\|?*]+/g, ' ').trim() || 'Blank';
   const date = (inpDate.value.trim() || 'Blank').replace(/[<>:"/\\|?*]+/g, ' ').trim() || 'Blank';
@@ -287,6 +323,7 @@ async function downloadFlyerImage() {
 
 function resetForm() {
   inpTitle.value = '';
+  inpSubtitle.value = '';
   inpDate.value = '';
   inpLocation.value = '';
   inpUrl.value = '';
@@ -299,8 +336,11 @@ function resetForm() {
   const customThumb = bgGrid.querySelector('.bg-thumb-custom');
   if (customThumb) customThumb.parentNode.removeChild(customThumb);
   clearAllThumbSelections();
+  const defaultCircleBtn = circleColorGrid.querySelector('.circle-color-swatch[data-circle-color="' + defaultCircleColor + '"]');
+  selectCircleColor(defaultCircleColor, defaultCircleBtn);
 
   updateTitle();
+  updateSubtitle();
   updateDate();
   updateLocation();
   updateEmail();
@@ -320,6 +360,12 @@ bgGrid.querySelectorAll('.bg-thumb[data-src]').forEach(function(btn) {
   });
 });
 
+circleColorGrid.querySelectorAll('.circle-color-swatch[data-circle-color]').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    selectCircleColor(btn.dataset.circleColor, btn);
+  });
+});
+
 inpBg.addEventListener('change', async function() {
   const file = inpBg.files[0];
   if (!file) return;
@@ -336,6 +382,7 @@ inpBg.addEventListener('change', async function() {
 });
 
 inpTitle.addEventListener('input', updateTitle);
+inpSubtitle.addEventListener('input', updateSubtitle);
 inpDate.addEventListener('input', updateDate);
 inpLocation.addEventListener('input', updateLocation);
 inpEmail.addEventListener('input', updateEmail);
@@ -357,7 +404,10 @@ descSizeIncreaseBtn.addEventListener('click', function() {
 warnSafariUsers();
 applyDescriptionTextSize();
 updateTitle();
+updateSubtitle();
 updateQr();
 updateDescription();
 updateEmail();
+const defaultCircleBtn = circleColorGrid.querySelector('.circle-color-swatch[data-circle-color="' + defaultCircleColor + '"]');
+selectCircleColor(defaultCircleColor, defaultCircleBtn);
 hideBackgroundImage();

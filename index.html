@@ -392,6 +392,27 @@
     overflow: visible;
   }
 
+  .subtitle-box {
+    min-height: 20px;
+    margin-top: 2.5mm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .subtitle {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-style: italic;
+    font-size: 15px;
+    line-height: 1.12;
+    letter-spacing: 0.01em;
+    color: rgba(255,255,255,0.96);
+  }
+
+  .subtitle-box:empty {
+    display: none;
+  }
+
   h1 {
     font-weight: 800;
     font-size: 30px;
@@ -564,6 +585,12 @@
     </div>
 
     <div class="field">
+      <label for="inp-subtitle">Course Subtitle</label>
+      <input type="text" id="inp-subtitle" placeholder="e.g. A practical workshop for new interviewers" autocomplete="off">
+      <span class="hint">Optional line shown beneath the course title.</span>
+    </div>
+
+    <div class="field">
       <label for="inp-date">Date</label>
       <input type="text" id="inp-date" placeholder="e.g. 14 July 2026" autocomplete="off">
     </div>
@@ -615,6 +642,21 @@
     </div>
 
     <div class="field">
+      <label>Circle Colour</label>
+      <div class="color-grid" id="circle-color-grid">
+        <button class="bg-thumb color-swatch circle-color-swatch" data-circle-color="#005EB8" style="background:#005EB8" title="Royal Blue"></button>
+        <button class="bg-thumb color-swatch circle-color-swatch" data-circle-color="#0072CE" style="background:#0072CE" title="Azure"></button>
+        <button class="bg-thumb color-swatch circle-color-swatch" data-circle-color="#C8102E" style="background:#C8102E" title="Crimson"></button>
+        <button class="bg-thumb color-swatch circle-color-swatch" data-circle-color="#A020F0" style="background:#A020F0" title="Violet"></button>
+        <button class="bg-thumb color-swatch circle-color-swatch" data-circle-color="#00843D" style="background:#00843D" title="Emerald"></button>
+        <button class="bg-thumb color-swatch circle-color-swatch" data-circle-color="#E03C31" style="background:#E03C31" title="Coral Red"></button>
+        <button class="bg-thumb color-swatch circle-color-swatch" data-circle-color="#0B3D91" style="background:#0B3D91" title="Navy"></button>
+        <button class="bg-thumb color-swatch circle-color-swatch" data-circle-color="#7A1E76" style="background:#7A1E76" title="Plum"></button>
+      </div>
+      <span class="hint">Sets the circle colour behind the title and subtitle.</span>
+    </div>
+
+    <div class="field">
       <label>Background Image</label>
       <div class="bg-grid" id="bg-grid">
         <button class="bg-thumb" data-src="Backgrounds/1.png" style="background-image:url('Backgrounds/1.png')"></button>
@@ -656,6 +698,10 @@
       <div class="title-wrap">
       <div class="title-box">
           <h1 id="out-title"></h1>
+        </div>
+
+        <div class="subtitle-box">
+          <div class="subtitle" id="out-subtitle"></div>
         </div>
 
         <div class="meta">
